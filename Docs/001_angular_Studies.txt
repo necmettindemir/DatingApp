@@ -1,0 +1,629 @@
+
+
+[ ASP.NET CORE WEB API + ANGULAR ] STUDY
+
+
+install dotnet
+instal  node
+install npm
+
+----------
+
+create a working folder
+in this folder ang001
+
+in command prompt in ang001 the followings should work
+
+\> dotnet --version
+\> node --version
+\> npm --version
+
+\> dotnet -h
+\> dotnet new -h
+
+\> dotnet new wepapi -h
+----------
+
+to create wepapi for DatingApp
+
+\> mkdir DatingApp
+\> cd DatingApp
+\> dotnet new webapi -o DatingApp.API -n DatingApp.API
+
+...wait
+
+\> cd DatingApp.API
+
+\> code .      // to create folder in visual code
+
+in visual studio install some extensions
+
+	c# for visual studio code (powered by OmniSharp) 1.17.1	
+	c# extensions 1.3.0
+	nuget packet manager 1.1.6
+	.NET Core Extension Pack 0.7.2
+	ASP.NET core snippets 1.0.5
+
+
+terminal\> dotnet add package Microsoft.EntityFrameworkCore
+terminal\> --dotnet add package Microsoft.EntityFrameworkCore.SqlServer
+		   --dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 2.0.0
+		   dotnet add package Microsoft.EntityFrameworkCore.SqlServer --version 2.2.1
+
+terminal\> dotnet add package Microsoft.EntityFrameworkCore.Design	
+
+terminal\> dotnet add package --version 1.1.0-msbuild3-final Microsoft.EntityFrameworkCore.Tools 
+		   -- in csproj upgrade it
+
+terminal\> dotnet restore      
+terminal\> dotnet run    
+      
+
+terminal\>dotnet run   //to run dot webAPI app
+
+terminal\>dotnet watch run // to run webAPI without stop-stat
+
+terminal\>dotnet ef -h //ef help
+
+		it will say 
+
+					
+					Entity Framework Core .NET Command-line Tools 3.0.0-preview.18572.1
+
+					Usage: dotnet ef [options] [command]
+
+					Options:
+					  --version        Show version information
+					  -h|--help        Show help information
+					  -v|--verbose     Show verbose output.
+					  --no-color       Don't colorize output.
+					  --prefix-output  Prefix output with level.
+
+					Commands:
+					  database    Commands to manage the database.
+					  dbcontext   Commands to manage DbContext types.
+					  migrations  Commands to manage migrations.
+
+					Use "dotnet ef [command] --help" for more information about a command.
+
+					
+
+terminal\>dotnet ef migrations add InitialCreate  // to undo  "ef migrations remove"
+
+			Entity Framework Core 2.2.1-servicing-10028 initialized 'DataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+			Done. To undo this action, use 'ef migrations remove'
+
+
+terminal\>dotnet ef database update
+
+
+			nfo: Microsoft.EntityFrameworkCore.Infrastructure[10403]
+				  Entity Framework Core 2.2.1-servicing-10028 initialized 'DataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+			info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+				  Executed DbCommand (33ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+				  SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+			info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+				  Executed DbCommand (37ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+				  CREATE TABLE [__EFMigrationsHistory] (
+					  [MigrationId] nvarchar(150) NOT NULL,
+					  [ProductVersion] nvarchar(32) NOT NULL,
+					  CONSTRAINT [PK___EFMigrationsHistory] PRIMARY KEY ([MigrationId])
+				  );
+			info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+				  Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+				  SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+			info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+				  Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+				  SELECT [MigrationId], [ProductVersion]
+				  FROM [__EFMigrationsHistory]
+				  ORDER BY [MigrationId];
+			info: Microsoft.EntityFrameworkCore.Migrations[20402]
+				  Applying migration '20190209135330_InitialCreate'.
+			Applying migration '20190209135330_InitialCreate'.
+			info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+				  Executed DbCommand (5ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+				  CREATE TABLE [Values] (
+					  [id] int NOT NULL IDENTITY,
+					  [Name] nvarchar(max) NULL,
+					  CONSTRAINT [PK_Values] PRIMARY KEY ([id])
+				  );
+			info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+				  Executed DbCommand (11ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+				  INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+				  VALUES (N'20190209135330_InitialCreate', N'2.2.1-servicing-10028');
+			Done.
+
+
+
+
+
+----------------------
+
+
+ANGULAR 
+
+
+after installing node
+
+os command prompt DatingApp \>
+
+-- 
+
+	npm install -g @angular/cli   or    npm install -g @angular/cli@6.0.8
+	ng new app-name
+	cd app-name
+	ng serve   or   npm start
+	
+	---- 
+	if you get error  "ERROR in node_modules/rxjs/internal/types.d.ts(81,44): error TS1005: ';' expected."
+	
+	1* Remove the  "node_modules" folder from your project
+
+	2* Go to package.json
+
+	3* Change rxjs version  to "rxjs": "6.3.3"
+
+	4* Go to console and run "npm install" again
+
+	5* And then run "ng serve"
+	---- 
+	
+-- 
+	
+	open chrome http://localhost:4200
+	
+-- 
+
+	install some visual studio code angular extensions
+	
+	Angular v7 Snippets  		7.0.1
+	Angular Files				1.6.2
+	Angular Language Service	0.1.11
+	angular2-switcher			0.2.0
+	Auto Rename Tag				0.0.15
+	Bracket Pair Colorizer		1.0.61
+	Debugger for Chrome			4.11.1
+	Material Icon Theme			3.6.3
+	Path Intellisense			1.4.2 -- already installed
+	Prettier - Code formatter	1.8.1
+	TSLint						1.0.42
+-- 
+
+	in Visual Studio Code
+	in Angular app > app > right click > add component > "value"
+	
+	ctrl+shift+p --> material icon... activate..
+
+
+-- 
+	add the following lines into app.modules.ts 
+	
+	import { NgModule } from '@angular/core';
+	import { HttpClientModule} from '@angular/common/http'; -- add this line
+
+	BroswserModule,
+	HttpClientModule  -- add this line
+		
+-- 
+
+	change values.components.ts as following
+	
+	
+	import { Component, OnInit } from '@angular/core';
+	import { HttpClient } from '@angular/common/http';
+
+	@Component({
+	  selector: 'app-value',
+	  templateUrl: './value.component.html',
+	  styleUrls: ['./value.component.css']
+	})
+	export class ValueComponent implements OnInit {
+
+	  values: any;
+
+	  constructor(private http: HttpClient) { }
+
+	  ngOnInit() {
+		this.getValues();
+	  }
+
+	  getValues() {
+		this.http.get('http://localhost:5000/api/values').subscribe(response => {
+			  this.values = response;
+			},
+			error => {
+			  console.log(error);
+			});
+	  }
+
+	}
+
+	
+	in chrome for angular
+	http://localhost:4200/
+	
+	will give error 
+	
+	Access to XMLHttpRequest at 'http://localhost:5000/api/values' 
+	from origin 'http://localhost:4200' has been blocked by 
+	CORS policy: No 'Access-Control-Allow-Origin' header is present 
+	on the requested resource.
+	
+	
+
+-- 
+
+To Solve CORS problem
+
+	in API project > Startup.cs add 2 line into 2 methods
+	
+	
+	1) in Public void ConfigureServices..
+	
+	services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+	services.AddCors(); // add this line
+
+	
+	
+	2) in public void Configure..
+	
+	app.UseCors(x=> x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()); // add this line
+	app.UseMvc();
+	
+	
+-- 
+
+	change value.component.html as the following
+	
+	<p *ngFor="let item of values">
+	  {{item.id}}, {{item.name}}
+	</p>
+
+	
+-- 
+
+	adding bootstrap and font to angular layer
+	
+	https://getbootstrap.com/
+	https://fontawesome.com/
+	
+	
+	in angular project  
+
+	angular project terimal\> npm install bootstrap font-awesome	
+	
+	the following should have been installed
+	+ font-awesome@4.7.0
+	+ bootstrap@4.2.1
+	
+
+-- 
+
+	add these two line to src>style.css
+	
+	/* You can add global styles to this file, and also import other style files */
+	@import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+	@import '../node_modules/font-awesome/css/font-awesome.min.css';
+
+
+
+-- 
+
+
+	integrating to GIT
+	
+	go to https://www.git-scm.com  //2.20.1
+	dowload git 
+	install git
+	
+		
+
+-- 	
+	basic git commands
+	https://confluence.atlassian.com/bitbucketserver/basic-git-commands-776639767.html
+	
+	
+	---
+	Tell Git who you are
+	
+	Configure the author name and email address to be used with your commits.
+
+	Note that Git strips some characters (for example trailing periods) from user.name.
+	
+	
+	\>git config --global user.name "Sam Smith"
+
+	\>git config --global user.email sam@example.com
+	
+	---
+	
+	Create a new local repository
+	
+	\>git init
+	
+	
+	
+	---
+
+	Check out a repository
+	
+	Create a working copy of a local repository:
+	
+	\>git clone /path/to/repository
+	
+	
+	For a remote server, use:
+	
+	\>git clone username@host:/path/to/repository
+	
+	---
+
+	Add files
+	
+	Add one or more files to staging (index)
+	
+	\>git add <filename>
+
+	\>git add *
+	
+
+	---
+
+	Commit
+	
+	Commit changes to head (but not yet to the remote repository):
+
+	\>git commit -m "Commit message"
+	
+	
+	Commit any files you've added with git add, and also commit any files you've changed since then:
+	\>git commit -a
+	
+	---
+
+	Push
+	
+	Send changes to the master branch of your remote repository:
+	
+	\>git push origin master
+	
+
+	---
+
+	Status
+
+	List the files you've changed and those you still need to add or commit:
+	
+	\>git status
+	
+	---
+
+	Connect to a remote repository
+	
+	If you haven't connected your local repository to a remote server, add the server to be able to push to it:
+
+	\>git remote add origin <server>
+	
+	
+	List all currently configured remote repositories:
+	
+	\>git remote -v
+	
+	---
+
+	Branches
+	
+	Create a new branch and switch to it:
+	\>git checkout <branchname>
+	
+	List all the branches in your repo, and also tell you what branch you're currently in:		
+	\>git branch
+	
+	
+	Delete the feature branch
+	\>git branch -d <branchname>
+
+	
+	Push the branch to your remote repository, so others can use it:
+	\>git push origin <branchname>
+	
+	
+	Push all branches to your remote repository:
+	\>git push --all origin
+	
+	
+	Delete a branch on your remote repository:
+	\>git push origin :<branchname>
+	
+	---
+
+	Update from the remote repository
+	
+	Fetch and merge changes on the remote server to your working directory:
+	\>git pull
+	
+	
+	To merge a different branch into your active branch:
+	\>git merge <branchname>
+	
+	
+	
+	View all the merge conflicts:
+	View the conflicts against the base file:
+	Preview changes, before merging:
+	
+	\>git diff
+
+	\>git diff --base <filename>
+
+	\>git diff <sourcebranch> <targetbranch>
+
+	
+	
+	
+	
+	After you have manually resolved any conflicts, you mark the changed file:
+	\>git add <filename>
+	
+	---
+
+	Tags
+	
+	You can use tagging to mark a significant changeset, such as a release:
+	\>git tag 1.0.0 <commitID>
+	
+	
+	CommitId is the leading characters of the changeset ID, up to 10, but must be unique. Get the ID using:
+	\>git log
+	
+	
+	
+	Push all tags to remote repository:
+	\>git push --tags origin
+	
+	
+
+	---
+
+	Undo local changes
+
+	If you mess up, you can replace the changes in your working tree with the last content in head:
+	Changes already added to the index, as well as new files, will be kept.
+
+	\>git checkout -- <filename>
+	
+	
+	Instead, to drop all your local changes and commits, fetch the latest history from the server and point your local master branch at it, do this:
+	
+	\>git fetch origin
+	\>git reset --hard origin/master
+
+	
+	
+	---
+	
+	Search
+	
+	Search the working directory for foo():
+	
+	\>git grep "foo()"
+
+	---
+
+	
+	
+-- 
+
+	in DatingApp
+	
+	1)    	\>git init
+	
+	2)		login to github.com and create a repository with name DatingApp
+	
+
+	
+	
+	3)		\>git config --global user.email "necmettindemir@yahoo.com"
+			\>git config --global user.name "Necmettin Demir"
+
+			
+	4) 		git commit -m "first commit"
+	
+	5) 		\>git remote add origin https://github.com/necmettindemir/DatingApp.git
+			  git add .
+
+	6) 		\>git config --global core.autocrlf true
+	
+	7) 		\>git pull
+	
+	8)		\>git commit -a
+	
+			login to github
+	
+	8)		git push origin master   or in visual code add from win screen
+			
+			
+	
+	
+-- 
+
+	
+
+
+
+-- 	
+	
+	
+
+-- 
+
+
+
+
+-- 
+
+
+
+
+
+-- 	
+	
+	
+
+-- 
+
+
+
+
+-- 
+
+
+
+
+
+-- 	
+	
+	
+
+-- 
+
+
+
+
+-- 
+
+
+
+
+
+-- 	
+	
+	
+
+-- 
+
+
+
+
+-- 
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+
+
+
+	
+	
+
+	
+	
+	
+	
