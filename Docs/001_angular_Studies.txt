@@ -3,7 +3,6 @@
 [ ASP.NET CORE WEB API + ANGULAR ] STUDY
 
 
-
 install dotnet
 instal  node
 install npm
@@ -549,51 +548,137 @@ To Solve CORS problem
 -- 
 
 	
+	add class user to Models
+	
+	public class User
+    {
+        public int Id { get; set; }
+        public string Username{ get; set; }
+        public byte[] PasswordHash { get; set; }
+        public byte[] PasswordSalt { get; set; }
 
+    }
 
 
 -- 	
 	
+	add DbSet to DataContext
 	
+	public DbSet<User> Users { get; set; }
+	
+	
+-- 
+
+	run in terminal of Dating.API\>  dotnet ef migrations add AddedUserEntity
+
+
+	Result will be
+	
+	info: Microsoft.EntityFrameworkCore.Infrastructure[10403]
+    Entity Framework Core 2.2.1-servicing-10028 initialized 'DataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+	Done. To undo this action, use 'ef migrations remove'
 
 -- 
 
-
-
-
--- 
-
-
-
-
-
+	run in terminal of Dating.API\>  dotnet ef database update
+	
+	
+	result 
+	
+	info: Microsoft.EntityFrameworkCore.Infrastructure[10403]
+		  Entity Framework Core 2.2.1-servicing-10028 initialized 'DataContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer' with options: None
+	info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+		  Executed DbCommand (54ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+		  SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+	info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+		  Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+		  SELECT OBJECT_ID(N'[__EFMigrationsHistory]');
+	info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+		  Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+		  SELECT [MigrationId], [ProductVersion]
+		  FROM [__EFMigrationsHistory]
+		  ORDER BY [MigrationId];
+	info: Microsoft.EntityFrameworkCore.Migrations[20402]
+		  Applying migration '20190212002252_AddedUserEntity'.
+	Applying migration '20190212002252_AddedUserEntity'.
+	info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+		  Executed DbCommand (25ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+		  CREATE TABLE [Users] (
+			  [Id] int NOT NULL IDENTITY,
+			  [Username] nvarchar(max) NULL,
+			  [PasswordHash] varbinary(max) NULL,
+			  [PasswordSalt] varbinary(max) NULL,
+			  CONSTRAINT [PK_Users] PRIMARY KEY ([Id])
+		  );
+	info: Microsoft.EntityFrameworkCore.Database.Command[20101]
+		  Executed DbCommand (4ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+		  INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
+		  VALUES (N'20190212002252_AddedUserEntity', N'2.2.1-servicing-10028');
+	Done.	
+	
 -- 	
 	
+	in Web API Startup.cs add the following line
+	
+	services.AddCors();
+	services.AddScoped<IAuthRepository, AuthRepository>(); //added line
+	
 	
 
 -- 
-
-
+	-- don't forget
+	
+	when creating new controller for API controller class should implement 
+	ControllerBase
 
 
 -- 
 
 
+	create a user DTO
+	
+	public class UserForRegisterDto
+    {
+        public string Username { get; set; }
 
+        public string Password { get; set; }
+    }
 
-
+	use it in Register
+	
+	
 -- 	
+
+
+	JWT - JSON web Tokens
+		
+-- 
+
+	add AddAuthentication to Startup.cs > ConfigureServices
 	
 	
+	 var secretKey = Configuration.GetSection("AppSettings:Token").Value;
+     services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                    .AddJwtBearer(options =>
+                    {
+                        options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+                            ValidateIssuer = false,
+                            ValidateAudience = false
+                        };
+                    });
+
+
 
 -- 
 
-
-
-
--- 
-
-
+	add AddAuthentication to Startup.cs > Configure
+	
+	
+	app.UseAuthentication(); //added line
+    app.UseMvc();
 
 
 
