@@ -23,6 +23,7 @@ export class NavComponent implements OnInit {
       },
       error => {
         console.log('opps');
+       // console.log(error);
       });
   }
 
