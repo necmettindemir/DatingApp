@@ -683,15 +683,674 @@ To Solve CORS problem
 
 
 -- 	
+
+	https://getbootstrap.com/
+	
+	there are lots of examples
 	
 	
 
 -- 
 
-
+	change nav.component.html as follows
+	
+	
+	<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+  <a class="navbar-brand" href="#">Dating App</a>
+  
+   
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="#">Matches</a>          
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Lists</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="#">Messages</a>
+      </li>     
+    </ul>
+    <form  #loginForm="ngForm" class="form-inline my-2 my-lg-0" (ngSubmit)="login()">
+      <input class="form-control mr-sm-2" type="text" name="username" #username="ngModel"
+              placeholder="Username" required [(ngModel)]="model.username">
+      <input class="form-control mr-sm-2" type="password" name="password" #password="ngModel"
+              placeholder="PAssword" required [(ngModel)]="model.password">
+      <button  [disabled]="!loginForm.valid" class="btn btn-success my-2 my-sm-0" type="submit">Login</button>
+    </form>
+  
+    
+</nav>
+	
 
 
 -- 
+
+
+	nav.component.ts as follows
+	
+	
+	import { Component, OnInit } from '@angular/core';
+
+	@Component({
+	  selector: 'app-nav',
+	  templateUrl: './nav.component.html',
+	  styleUrls: ['./nav.component.css']
+	})
+	export class NavComponent implements OnInit {
+
+
+	  model: any = {};
+
+	  constructor() { }
+
+	  ngOnInit() {
+	  }
+
+
+	  login() {
+		console.log(this.model);
+	  }
+		
+
+
+
+-- 	
+	
+	
+
+	add _services into app folder
+	
+	> _services > right click > Generate Service
+	
+	name : auth
+	
+	
+	auth.service.ts 		-- will be added
+	auth.service.spec.ts 	-- will be added
+	
+		
+-- 
+
+	add this service to app.module.ts as follows
+	
+	
+	import { BrowserModule } from '@angular/platform-browser';
+	import { NgModule } from '@angular/core';
+	import { HttpClientModule} from '@angular/common/http';
+	import { FormsModule } from '@angular/forms';
+
+	import { AppRoutingModule } from './app-routing.module';
+	import { AppComponent } from './app.component';
+	import { ValueComponent } from './value/value.component';
+	import { NavComponent } from './nav/nav.component';
+	import { AuthService } from './_services/auth.service';
+
+	@NgModule({
+	   declarations: [
+		  AppComponent,
+		  ValueComponent,
+		  NavComponent
+	   ],
+	   imports: [
+		  BrowserModule,
+		  AppRoutingModule,
+		  HttpClientModule,
+		  FormsModule
+	   ],
+	   providers: [
+		  AuthService //added
+	   ],
+	   bootstrap: [
+		  AppComponent
+	   ]
+	})
+	export class AppModule { }
+
+	
+-- 	
+	token can be analyzed here
+	
+	https://jwt.io/
+
+
+	more info in debug of chrome
+		
+	Console.. Netwtork, Application
+	
+
+
+-- 
+
+
+	to pass value from home to child
+	
+	
+	
+	in child  ts
+	
+	export class RegisterComponent implements OnInit {
+			@Input() valuesFromHome: any;  //added line
+	...
+	}
+
+	
+	
+	
+
+	in child html 
+	
+    <div class="form-group">
+		<label for="favouriteValue">What is your fav value ?</label>
+		<select class="form-control" id="favourietValue">
+		  <option *ngFor="let item of valuesFromHome" value={{item.id}}>{{item.name}}</option>
+		</select>
+	</div>
+
+	
+	in home (parent) ts
+	
+	---
+	  export class HomeComponent implements OnInit {
+	  values: any = {};
+	  registerMode = false;
+
+	  constructor(private http: HttpClient) { }
+
+	  ngOnInit() {
+		this.values = this.getValues();
+	  }
+
+	  registerToogle() {
+		this.registerMode = !this.registerMode;
+	  }
+
+
+	  getValues() {
+		this.http.get('http://localhost:5000/api/values').subscribe(response => {
+			  this.values = response;
+			},
+			error => {
+			  console.log(error);
+			});
+	  }
+
+
+	}
+	---
+	
+	
+	
+	
+	in home (parent) html 
+	
+	 <div class="col-4">
+              <app-register [valuesFromHome]="values"></app-register>
+     </div>
+	
+-- 	
+	
+	to pass value from child to home(parent)
+
+
+	in child ts
+	
+	
+	import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
+	
+	export class RegisterComponent implements OnInit {
+	@Input() valuesFromHome: any;
+	@Output() cancelRegister = new EventEmitter(); //added from @angular/core
+	...
+	
+		
+	 cancel() 
+	 {
+		this.cancelRegister.emit(false);
+		console.log('cancelled');
+	 }
+	 
+	}
+	
+	
+	
+
+	
+	in home (parent) ts
+	
+
+	cancelRegisterMode(registerMode: boolean) {
+		this.registerMode = registerMode;
+	}
+	
+	
+	
+	
+	
+	in home (parent) html
+	
+	
+	<div  *ngIf="registerMode" class="container">
+      <div class="row justify-content-center">
+        <div class="col-4">
+              <app-register [valuesFromHome]="values"  (cancelRegister)="cancelRegisterMode($event)"></app-register>
+        </div>
+      </div>
+  </div>
+	
+-- 
+
+
+	how to use 3rd party components
+	
+	- Alertifyjs
+	- Angular JWT
+	- NGX Bootstrap
+	- Bootswatch
+	
+	
+---	
+	add Alertifyjs to angular+core project
+	go to alertifyjs.com
+
+	1) vs terminal\> npm install alertifyjs --save
+	2) in agular.json (it requires restart!!)
+	
+	    add the following line into script array
+						 
+            "scripts": [
+              "node_modules/alertifyjs/build/alertify.min.js"  //added
+            ],
+					
+---
+
+
+	add lines to style.css in  
+	
+	"styles": [
+              "src/styles.css"
+            ],
+	
+
+	@import '../node_modules/alertifyjs/build/css/alertify.min.css';
+	@import '../node_modules/alertifyjs/build/css/themes/bootstrap.min.css';
+	
+-- 	
+	
+	
+	add angular JWT
+	
+	google auth0 Angular JWT
+	
+	
+	we want to react the link 
+	https://github.com/auth0/angular2-jwt
+	
+	NOTE: This library is now at version 2 and is published on npm as @auth0/angular-jwt. If you're looking for the pre-v1.0 version of this library, it can be found in the pre-v1.0 branch and on npm as angular2-jwt.
+
+	@auth0/angular-jwt v2 is to be used with Angular v6+ and RxJS v6+. For Angular v4.3 to v5+, use @auth0/angular-jwt v1
+	
+	
+	VS code terminal\>npm install @auth0/angular-jwt		//install v 2.0.0.
+	or 
+	VS code terminal\>npm install @auth0/angular-jwt@2.0.0  //same
+	
+
+-- 
+
+	add sth about jwt library to auth.service.ts
+	
+	
+
+-- 	
+	
+	
+	ngx bootstrap --> Bootstrap components, powered by Angular
+
+	go to page https://valor-software.com/ngx-bootstrap/#/dropdowns
+	
+	VS code terminal\>npm install ngx-bootstrap --save
+	or
+	VS code terminal\>npm install ngx-bootstrap@3.0.1 --save	
+	
+	
+	ngx-bootstrap@3.2.0  installed as last version
+	
+	
+	add  the following two lines to app.component.ts 
+	
+	
+	import { BrowserModule } from '@angular/platform-browser';
+	import { NgModule } from '@angular/core';
+	import { HttpClientModule} from '@angular/common/http';
+	import { FormsModule } from '@angular/forms';
+	import { BsDropdownModule } from 'ngx-bootstrap'; //added
+	..
+	
+		
+	 imports: [
+      BrowserModule,
+      AppRoutingModule,
+      HttpClientModule,
+      FormsModule,
+      BsDropdownModule.forRoot() //added
+   ],
+   ..
+	
+	
+-- 
+
+
+	for a bit more color
+	
+	bootswatch.com
+	free themes for bootstrap
+
+
+	VS code terminal\>npm install bootswatch
+	or 
+	VS code terminal\>npm install bootswatch@4.1.1
+	
+	after installing bootswatch
+	add the following line to style.css
+	
+	@import '../node_modules/bootswatch/dist/united/bootstrap.min.css';
+-- 	
+	
+
+	routing
+	
+	- setting up routing
+	- using RouterLinkActive
+	- using Routing in Code
+	- Protecting the Routes
+	- Protecting multiple Routes at once
+	
+	
+-- 
+
+	add new modules 
+	on app folder > right click -> generate component for each
+	
+	- lists
+	- member-list
+	- messages
+	
+	after adding 
+	app.module.ts should include the followings automatically
+	
+	
+	
+	import { MemberListComponent } from './member-list/member-list.component';
+	import { ListsComponent } from './lists/lists.component';
+	import { MessagesComponent } from './messages/messages.component';
+	..
+	
+
+	and
+	
+	@NgModule({
+   declarations: [
+      AppComponent,
+      ValueComponent,
+      NavComponent,
+      HomeComponent,
+      RegisterComponent,
+      MemberListComponent,  //just added
+      ListsComponent,		//just added
+      MessagesComponent		//just added
+   ],
+   imports: [
+      BrowserModule,
+      AppRoutingModule,
+      HttpClientModule,
+      FormsModule,
+      BsDropdownModule.forRoot()      
+   ],
+	...
+
+
+-- 	
+	
+	add a new file for routing operations to app folder 
+	file name : routes.ts
+	
+	write the following inside routes.ts
+	
+	import { Routes } from '@angular/router';
+	import { HomeComponent } from './home/home.component';
+	import { MemberListComponent } from './member-list/member-list.component';
+	import { MessagesComponent } from './messages/messages.component';
+	import { ListsComponent } from './lists/lists.component';
+
+	export const appRoutes: Routes = [
+		{ path: 'home', component: HomeComponent },
+		{ path: 'members', component: MemberListComponent },
+		{ path: 'messages', component: MessagesComponent },
+		{ path: 'lists', component: ListsComponent },
+		{ path: '**', redirectTo: 'home', pathMatch: 'full' }
+	];
+
+
+
+
+	
+	
+-- 
+
+	add the fol lines to app.modules.ts 
+	
+	..
+	import { RouterModule } from '@angular/router'; //added for routing
+	..
+	import { appRoutes } from './routes';
+	...
+	
+	
+   imports: [
+      BrowserModule,
+      AppRoutingModule,
+      HttpClientModule,
+      FormsModule,
+      BsDropdownModule.forRoot(),
+      RouterModule.forRoot(appRoutes)  		//added for routing
+   ],
+
+
+
+-- 	
+	
+	
+	change links in nav.component.html as follows
+	
+	..
+	<a class="nav-link" [routerLink]="['/lists']">Lists</a>
+	..
+
+-- 
+
+
+	in app.component.html
+	
+	delete <app-home></app-home>
+	add <router-outlet></router-outlet>
+
+
+
+-- 	
+	
+	
+	use in login  method in nav.component.ts 
+	
+	this.router.navigate(['/members']);
+	
+	
+	
+	use in logout method in nav.component.ts 
+		
+	this.router.navigate(['/home']);
+
+
+	
+	
+-- 
+
+	guarding links!
+	
+
+	add _guards folder into app
+	
+	cd into _guards
+	_guards\>ng g guard auth --spec=false
+	
+	create canActivate if asked?
+	
+	you should see the message
+	"CREATE src/app/_guards/auth.guard.ts (248 bytes)"
+
+	
+	
+-- 	
+		
+	auth.guard.ts must be as follows
+	
+	
+	import { Injectable } from '@angular/core';
+	import { AuthService } from '../_services/auth.service';
+	import { Router } from '@angular/router';
+	import { AlertifyService } from '../_services/alertify.service';
+	import { CanActivate } from '@angular/router';
+
+	@Injectable({
+	  providedIn: 'root'
+	})
+	export class AuthGuard implements  CanActivate {
+
+	  constructor(private authService: AuthService,
+				  private router: Router,
+				  private alertify: AlertifyService
+				) {}
+
+	  canActivate(): boolean {
+
+		if (this.authService.loggedIn()) {
+			return true;
+		}
+
+		this.alertify.error('You will not pass!');
+		this.router.navigate(['/home']);
+		return false;
+	  }
+
+	}
+
+
+	
+
+-- 
+
+	routes.ts will be as follows
+	
+	....
+	import { ListsComponent } from './lists/lists.component';
+	import { AuthGuard } from './_guards/auth.guard'; 			// added
+
+	export const appRoutes: Routes = [
+		{ path: 'home', component: HomeComponent },
+		{ path: 'members', component: MemberListComponent, canActivate: [AuthGuard] }, //canActivate: [AuthGuard] is added
+		{ path: 'messages', component: MessagesComponent },
+		{ path: 'lists', component: ListsComponent },
+		{ path: '**', redirectTo: 'home', pathMatch: 'full' }
+	];
+
+
+
+
+
+-- 	
+	
+	multiple routes guarding..
+
+	change export in routes.ts as follows
+	
+	
+	
+	export const appRoutes: Routes = [
+		{ path: 'home', component: HomeComponent},
+		{
+			path: '',
+			runGuardsAndResolvers: 'always',
+			canActivate: [AuthGuard],
+			children: [
+				{ path: 'members', component: MemberListComponent },
+				{ path: 'messages', component: MessagesComponent},
+				{ path: 'lists', component: ListsComponent }
+			]
+		},
+		{ path: '**', redirectTo: 'home', pathMatch: 'full' }
+	];
+	
+	
+-- 
+
+
+	extend user class
+	more migrations
+	cascade delete
+	seeding data into our dbcontext
+	creating new repo
+	using automapper
+	
+
+
+
+-- 	
+		
+	extend API
+	
+	extend class User 
+	add new class Photo
+	
+	
+	for API in command prompt run the following command
+	
+	API terminal\> dotnet ef migrations add ExtendedUserClass  //creates migration class in project's Migrations folder
+	
+	
+			\>dotnet ef //gives usage
+			
+			commands
+			- database
+			- dbcontext
+			- migrastions
+			
+			\>dotnet ef migrations -h // help content for migrastions
+			
+			-add
+			-list
+			-remove
+			-script
+	
+			\>dotnet ef migrations list
+			
+			20190209135330_InitialCreate
+			20190212002252_AddedUserEntity
+			20190216192908_ExtendedUserClass
+	
+			however we do not know which is run is db which is not!
+			So,  we can have look at table __EFMigrationsHistory in db
+			
+			\>dotnet ef migrations remove -- removes last migration from migration list of API
+			now we can add new migrations of user
+			
+			\>dotnet ef migrations add ExtendedUserClass
+			\>dotnet ef database update
+			
+			
+-- 
+
+
+
+
 
 
 
@@ -703,13 +1362,563 @@ To Solve CORS problem
 
 
 	
+	
+-- 
 
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
 
 
 	
 	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
 
 	
 	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+	
+
+-- 
+
+
+
+
+
+
+-- 	
+	
+	
+
+
+	
+	
+-- 
+
+
+
+
+
+
+-- 	
+		
+	
+		
+	
+	
+			
+	
+		
+	
+	
+			
+	
+		
+	
+	
+			
+	
+		
+	
+	
+			
+	
+		
+	
+	
+			
+	
+		
+	
+	
+			
+	
+		
 	
 	

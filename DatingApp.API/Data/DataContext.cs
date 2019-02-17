@@ -17,6 +17,8 @@ namespace DatingApp.API.Data
         public DbSet<User> Users { get; set; }
 
 
+        public DbSet<Photo> Photos { get; set; }
+
         // public async Task<List<PeopleType>> GetAsyncPeopleList()
         // {
         //     List<PeopleType> peopleList = new List<PeopleType>()
