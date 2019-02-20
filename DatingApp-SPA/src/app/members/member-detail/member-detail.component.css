@@ -1,0 +1,17 @@
+/* @import '../member-card/member-card.component.css'; */
+
+.img-thumbnail {
+    margin: 15px;
+    width: 90%;
+    height: 90%;
+}
+
+.card-body {
+    padding: 0 25px;
+}
+
+.card-footer {
+    padding: 10px 15px;
+    background-color: #fff;
+    border-top: none;    
+}
