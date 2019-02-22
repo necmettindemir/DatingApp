@@ -8,7 +8,10 @@ import { JwtModule } from '@auth0/angular-jwt';
 import { NgxGalleryModule } from 'ngx-gallery';
 
 import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './AppComponent';
+// import { AppComponent } from './AppComponent';
+import { AppComponent } from './app.component';
+
+
 import { ValueComponent } from './value/value.component';
 import { NavComponent } from './nav/nav.component';
 import { AuthService } from './_services/auth.service';
@@ -28,6 +31,8 @@ import { MemeberDetailResolver } from './_resolvers/member-detail.resolver';
 import { MemeberListResolver } from './_resolvers/member-list.resolver';
 import { MemberEditComponent } from './members/member-edit/member-edit.component';
 import { MemberEditResolver } from './_resolvers/member-edit.resolver';
+import { PreventUnsavedChanges } from './_guards/prevent-unsaved-changes.guard';
+
 
 
 
@@ -60,7 +65,7 @@ export function tokenGetter() {
       NgxGalleryModule,
       JwtModule.forRoot({
          config: {
-            tokenGetter: tokenGetter,
+            tokenGetter, // tokenGetter: tokenGetter,
             whitelistedDomains: ['localhost:5000'],
             blacklistedRoutes: ['localhost:5000/api/auth']
          }
@@ -74,7 +79,8 @@ export function tokenGetter() {
       UserService,
       MemeberDetailResolver,
       MemeberListResolver,
-      MemberEditResolver
+      MemberEditResolver,
+      PreventUnsavedChanges
    ],
    bootstrap: [
       AppComponent
