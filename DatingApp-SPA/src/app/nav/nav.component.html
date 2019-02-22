@@ -41,7 +41,7 @@
       </a>
 
       <div class="dropdown-menu mt-3" *dropdownMenu>
-        <a class="dropdown-item" href="#"><i class="fa fa-user"></i>Edit Profile</a>
+        <a class="dropdown-item" [routerLink]="['/member2/edit']"><i class="fa fa-user"></i>Edit Profile</a>
         <div class="dropdown-item" href="#"></div>
         <a class="dropdown-item" (click)="logout()"><i class="fa fa-sign-out"></i>Logout</a>
       </div>
@@ -51,7 +51,7 @@
 
 
       <form  *ngIf="!loggedin()" #loginForm="ngForm" class="form-inline my-2 my-lg-0" (ngSubmit)="login()">
-        <input class="form-control mr-sm-2" type="text" name="username" #username="ngModel"
+        <input class="form-control mr-sm-2" type="text" name="username" #username="ngModel"                        
                 placeholder="username" required [(ngModel)]="model.username">
         <input class="form-control mr-sm-2" type="password" name="password" #password="ngModel"
                 placeholder="password" required [(ngModel)]="model.password">

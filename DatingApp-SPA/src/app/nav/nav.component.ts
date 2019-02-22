@@ -19,6 +19,10 @@ export class NavComponent implements OnInit {
               ) { }
 
   ngOnInit() {
+
+    this.model.username = 'lopez';
+    this.model.password = 'password';
+
   }
 
 
@@ -28,8 +32,8 @@ export class NavComponent implements OnInit {
         this.alertify.success('Logged in successfully');
 
         //-----
-        this.model.username = '';
-        this.model.password = '';
+       // this.model.username = '';
+       // this.model.password = '';
         //-----
       },
       error => {
