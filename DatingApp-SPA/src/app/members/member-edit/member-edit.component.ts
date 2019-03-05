@@ -16,6 +16,7 @@ import { NgForm } from '@angular/forms';
 export class MemberEditComponent implements OnInit {
 
   user: User;
+  photoUrl: string;
 
   @ViewChild('editForm') editForm: NgForm;
 
@@ -46,6 +47,9 @@ export class MemberEditComponent implements OnInit {
       });
 
      // this.loadUser();
+
+      // this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
+      this.authService.currentPhotoUrl.subscribe(p => this.photoUrl = p);
     }
 
 
@@ -84,6 +88,10 @@ export class MemberEditComponent implements OnInit {
         this.alertify.error('opps! ' + error.error);
       }
 
+    }
+
+    updateMainPhoto(photoUrl) {
+      this.user.photoUrl = photoUrl;
     }
 
 }

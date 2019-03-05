@@ -12,6 +12,7 @@ export class NavComponent implements OnInit {
 
 
   model: any = {};
+  photoUrl: string;
 
   constructor(public authService: AuthService, 
               private alertify: AlertifyService,
@@ -23,22 +24,23 @@ export class NavComponent implements OnInit {
     this.model.username = 'lopez';
     this.model.password = 'password';
 
+    this.authService.currentPhotoUrl.subscribe(photoUrl => this.photoUrl = photoUrl);
   }
 
 
   login() {
     this.authService.login(this.model).subscribe(next => {
-        //console.log('logged in successfuly');
+        // console.log('logged in successfuly');
         this.alertify.success('Logged in successfully');
 
-        //-----
+        // -----
        // this.model.username = '';
        // this.model.password = '';
-        //-----
+        // -----
       },
       error => {
        // console.log('opps');
-        //console.log(error);
+        // console.log(error);
         this.alertify.error(error);
       },
       () => {
@@ -48,15 +50,21 @@ export class NavComponent implements OnInit {
   }
 
   loggedin() {
-    //const token = localStorage.getItem('token');
-    //return !!token;
+    // const token = localStorage.getItem('token');
+    // return !!token;
 
     return this.authService.loggedIn();
   }
 
   logout() {
     localStorage.removeItem('token');
-    //console.log('logged out');
+    // console.log('logged out');
+
+    localStorage.removeItem('user');
+
+    this.authService.decodedToken = null;
+    this.authService.currentUser = null;
+
     this.alertify.message('logged out');
 
     this.router.navigate(['/home']);
