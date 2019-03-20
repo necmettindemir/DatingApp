@@ -2,6 +2,9 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { AuthService } from '../_services/auth.service';
 import { AlertifyService } from '../_services/alertify.service';
 import { FormGroup, FormControl, Validators, FormBuilder } from '@angular/forms';
+import { BsDatepickerConfig } from 'ngx-bootstrap';
+import { User } from '../_models/user';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
@@ -12,10 +15,14 @@ export class RegisterComponent implements OnInit {
   @Input() valuesFromHome: any;
   @Output() cancelRegister = new EventEmitter();
 
-  model: any = {};
+  // model: any = {};
+  user: User;
+
   registerForm: FormGroup;
+  bsConfig: Partial<BsDatepickerConfig>;
 
   constructor(private authService: AuthService,
+              private router: Router,
               private alertify: AlertifyService,
               private fb: FormBuilder) { }
 
@@ -27,6 +34,9 @@ export class RegisterComponent implements OnInit {
     //   confirmPassword: new FormControl('', Validators.required)
     // }, this.passwordMatchValidator);
 
+    this.bsConfig = {
+      containerClass: 'theme-red'
+    };
     this.createRegisterForm();
 
   }
@@ -61,13 +71,33 @@ export class RegisterComponent implements OnInit {
       //             // console.log(error);
       //             this.alertify.error(error);
       //         }
-      //);
-    console.log(this.registerForm.value);
+      // );
+
+      if (this.registerForm.valid ) {
+
+          this.user = Object.assign({}, this.registerForm.value);
+          this.authService.register(this.user).subscribe(
+          () => {
+            this.alertify.success('registration successful');
+          },
+          error => {
+            this.alertify.error(error);
+          },
+          () => {
+            this.authService.login(this.user).subscribe( () => {
+              this.router.navigate(['/members']);
+            });
+          }
+          );
+
+      }
+
+      console.log(this.registerForm.value);
   }
 
   cancel() {
     this.cancelRegister.emit(false);
-    //console.log('cancelled');
+    // console.log('cancelled');
     this.alertify.message('cancelled');
   }
 }

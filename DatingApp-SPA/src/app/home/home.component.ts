@@ -17,7 +17,7 @@ export class HomeComponent implements OnInit {
   }
 
   registerToogle() {
-    this.registerMode = !this.registerMode;//true; //
+    this.registerMode = !this.registerMode; // true; //
   }
 
 

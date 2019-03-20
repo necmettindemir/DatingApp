@@ -10,7 +10,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-
 using Microsoft.EntityFrameworkCore;
 //using Microsoft.EntityFrameworkCore.UseSqlServer;
 //using Microsoft.EntityFrameworkCore.SqlServer;
