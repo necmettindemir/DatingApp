@@ -1348,222 +1348,887 @@ To Solve CORS problem
 			
 -- 
 
+			seeding mssql database
+			
+			open json-generator.com
+			
+			--- for females ---
+			
+			===========
+			Snippet for JSON Generator site at https://www.json-generator.com/
+			===========
 
+			[
+			  '{{repeat(5)}}',
+			  {
+				Username: '{{firstName("female")}}',
+				Gender: 'female',
+				DateOfBirth: '{{date(new Date(1950,0,1), new Date(1999, 11, 31), "YYYY-MM-dd")}}',
+				Password: 'password',
+				KnownAs: function(){ return this.Username; },
+				Created: '{{date(new Date(2017,0,1), new Date(2017, 7, 31), "YYYY-MM-dd")}}',
+				LastActive: function(){return this.DateCreated; },
+				Introduction: '{{lorem(1, "paragraphs")}}',
+				LookingFor: '{{lorem(1, "paragraphs")}}',
+				Interests: '{{lorem(1, "sentences")}}',
+				City: '{{city()}}',
+				Country: '{{country()}}',
+				Photos: [
+					{
+					  url: function(num) {
+					  return 'https://randomuser.me/api/portraits/women/' + num.integer(1,99) + '.jpg';
+					},
+					isMain: true,
+					description: '{{lorem()}}'
+				  }
+				]
+			  }
+			]
 
+			--- /for females ---
+			
+			
+			--- for males ---
+			
+			===========
+			Snippet for JSON Generator site at https://www.json-generator.com/
+			===========
 
+			[
+			  '{{repeat(5)}}',
+			  {
+				Username: '{{firstName("male")}}',
+				Gender: 'male',
+				DateOfBirth: '{{date(new Date(1950,0,1), new Date(1999, 11, 31), "YYYY-MM-dd")}}',
+				Password: 'password',
+				KnownAs: function(){ return this.Username; },
+				Created: '{{date(new Date(2017,0,1), new Date(2017, 7, 31), "YYYY-MM-dd")}}',
+				LastActive: function(){return this.DateCreated; },
+				Introduction: '{{lorem(1, "paragraphs")}}',
+				LookingFor: '{{lorem(1, "paragraphs")}}',
+				Interests: '{{lorem(1, "sentences")}}',
+				City: '{{city()}}',
+				Country: '{{country()}}',
+				Photos: [
+					{
+					  url: function(num) {
+					  return 'https://randomuser.me/api/portraits/men/' + num.integer(1,99) + '.jpg';
+					},
+					isMain: true,
+					description: '{{lorem()}}'
+				  }
+				]
+			  }
+			]
 
-
-
-
+			--- /for males ---
+			
+			
+			generate 5 female and 5 male as json
+			
+			in DatingApp.API > Data folder create a file UserSeedData.json
+			put all generated json content into this file
 
 -- 	
 	
+		
+			in DatingApp.API > Data folder create a file Seed.cs
+			
+			
+			in Startup.cs > ConfigureServices add the following
+			
+			//-----------------------------------------
+			....
+			 services.AddCors();
+
+            //--- for example data ----
+
+            services.AddTransient<Seed>(); //added
+
+            //--- /for example data ----
+
+            services.AddScoped<IAuthRepository, AuthRepository>();
+			....
+			//-----------------------------------------
+			
+			
+			
+			
+			
+			
+			in Startup.cs > Configure add the following
+			
+			//-----------------------------------------
+			.....
+            //--- for example data ----
+            seeder.SeedUsers();					//added
+            //--- /for example data ----
+
+            app.UseCors(x=> x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+			....
+			
+			//-----------------------------------------
 	
-
-
+		change
+		
+			 public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+		
+		as below
+			
+			public void Configure(IApplicationBuilder app, IHostingEnvironment env, Seed seeder)
+	
 	
 	
 -- 
 
 
+			API terminal\> dotnet ef database drop			//drop db
+			
+			API terminal\> dotnet ef database update		//recreate everything
+
+			
+
+
+-- 	
+		
+		create UsersController
+		
+		you may get error
+		"Expected ',' instead of ''"
+	
+		to handle this example
+		
+		chage a line in Startup.cs > ConfigureServices
+		
+		-->  services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+				
+		as follows
+		
+		-->  services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+                .AddJsonOptions(opt =>
+                {
+                    opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+                });
+		
+		
+			
+-- 
+
+		-> create some user related Dtos..
+		
+		-> using nuget manager add  extension  "Automapper.Extensions.Microsoft.DependencyInjection"
+		as 4.0.1
+		
+		-> add the following line into  Status.cs > ConfigureServices
+		as below
+		
+				
+				--------------
+					...
+					services.AddCors();
+					services.AddAutoMapper(); //added
+					...
+				--------------
+		
+
+
+
+		-> change UsersController as below
+		
+				-----
+				
+				....
+				private readonly IDatingRepository _repo;
+				private readonly IMapper _mapper;
+
+				//public UsersController(IDatingRepository repo)
+				public UsersController(IDatingRepository repo, IMapper mapper)
+				{
+					_repo = repo;
+					_mapper = mapper;
+				}
+				....
+				
+				-----
+				
+		-> in UsersController > GetUsers and GetUser use AutoMapper
+		
+		-------------------------
+		[HttpGet("{id}")] // to use as http://localhost:5000/api/users/2
+        public async Task<IActionResult> GetUser(int id)
+        {
+            var user = await _repo.GetUser(id);
+
+            var userToReturn = _mapper.Map<UserForDetailedDto>(user);
+
+            //return Ok(user);
+            return Ok(userToReturn);
+
+        }
+		-------------------------
+
+-- 	
+	
+		add  the following class into Helper folder
+		
+		----
+
+		public class AutoMapperProfiles: Profile
+		{
+			public AutoMapperProfiles()
+			{
+				CreateMap<User, UserForListDto>();
+				CreateMap<User, UserForDetailedDto>();
+				CreateMap<Photo, PhotosForDetailedDto>();
+			}
+
+		}
+				
+		----
+			
+		add the following metdod to "Helper > Extension"
+		
+		---
+		public static int CalculateAge(this DateTime theDateTime)
+        {
+            var age = DateTime.Today.Year - theDateTime.Year;
+
+            if (theDateTime.AddYears(age) > DateTime.Today)
+                age--;
+
+            return age;
+        }
+		
+		---
+
+
+
+			
+		extend AutoMapperProfiles as below
+			
+		---
+					
+		
+		public AutoMapperProfiles()
+        {
+
+            CreateMap<User, UserForListDto>()
+                .ForMember(dest => dest.PhotoUrl, opt =>
+                {
+                    opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
+                })
+                .ForMember(dest => dest.Age, opt =>
+                {
+                    opt.ResolveUsing(d => d.DateOfBirth.CalculateAge());
+                });
+
+
+
+            CreateMap<User, UserForDetailedDto>()
+                .ForMember(dest => dest.PhotoUrl, opt =>
+                {
+                    opt.MapFrom(src => src.Photos.FirstOrDefault(p => p.IsMain).Url);
+                })
+                .ForMember(dest => dest.Age, opt =>
+                {
+                    opt.ResolveUsing(d => d.DateOfBirth.CalculateAge());
+                });
+
+
+
+            CreateMap<Photo, PhotosForDetailedDto>();
+        }
+
+		
+		---
+
+	
+	
+-- 
+
+		making more beatiful interface
+		
+		
+		- using types in TypeScript
+		- Retrieving Users from the API
+		- Using Bootstrap to create Member cards
+		- Adding a detailed view of the user
+		- router resolvers
+		- adding a photo gallery
+
+-- 	
+		typescript -- super set of js and
+		- static typing
+		- interface
+		- class
+		- public/private
+	
+	
+							transpiled
+		typescript code ----------------------> javascript
+	
+	
+		
+-- 
+		-- static typing
+		
+		-- transpiled without error
+		let name = "bob";
+		name = 10;
+
+		-- error during transpilation
+		let name:string = "bob";
+		name = 10;			
+-- 	
+	
+	
+		--interfaces
+		
+		-- OK ---
+		interface Bird{
+			name     : string
+			hasWings : boolean
+		}
+
+		let myClass : Bird
+		
+		myClass = { name:'seagull' hasWings:true  }
+		-- /OK ---
+		
+		-- NOT OK ---
+		interface Bird{
+			name     : string			
+		}
+
+		let myClass : Bird
+		
+		myClass = { name:'seagull' hasWings:true  }
+		-- /NOT OK ---
+		
+		
+		-- OK ---
+		interface Bird{
+			name     : string
+			hasWings? : boolean //? : optional
+		}
+
+		let myClass : Bird
+		
+		myClass = { name:'seagull' hasWings:true  }
+		-- /OK ---
+		
+		
+		"
+		 interface is used by typescript only at compile time. Then it is removed.
+		 interfaces do not end up in our final JavaScript output.
+		"
+		
+		-compile time checking
+		-intellisence
+		-auto completion
+		
+		
+-- 
+
+		-> add user.service.ts as service to DatingSPA > src > app >  _services
+		
+		-> add the following line to DatingSPA > src > app > environments > environment.ts
+		
+			apiUrl: 'http://localhost:5000/api/'
+		
+		-> use environment.apiUrl where you want
+		   for example in auth.service.ts
+		   
+		
+
+
+-- 	
+		
+		-> add the following lines of code to user.service.ts
+		for authorization
+		
+		
+		const httpOptions = {
+		  headers: new HttpHeaders(
+			{
+				Authorization: 'Bearer ' + localStorage.getItem('token'); 
+			})
+		};
+		
+		
+		-> user httpOptions in getUser and getUsers methods in user.service.ts
+	
+
+-- 
+
+	
+		-> add member-card component into src > app > members
+		
+			however @Component in member-card.component.ts will show error!
+			why ? because component is not directly in app folder
+			
+			solution : add this component to declarations in app.module.ts 
+			
+			
+
+
+
+-- 	
+	
+		-> at front end (angular level) check token is expired or not!
+		
+		add the following liens to imports of app.modules.ts
+		
+		...
+		 JwtModule.forRoot({
+         config: {
+            tokenGetter: this.tokenGetter,
+            whitelistedDomains: ['localhost:5000'],
+            blacklistedRoutes: ['localhost:5000/api/auth']
+         }
+		...
+
+	
+	
+-- 
+
+		add component "member-detail"
+		
+		--> ts file can be as below.
+		
+		
+				import { Component, OnInit } from '@angular/core';
+				import { User } from 'src/app/_models/user';
+				import { UserService } from 'src/app/_services/user.service';
+				import { AlertifyService } from 'src/app/_services/alertify.service';
+				import { ActivatedRoute } from '@angular/router';
+
+				@Component({
+				  selector: 'app-member-detail',
+				  templateUrl: './member-detail.component.html',
+				  styleUrls: ['./member-detail.component.css']
+				})
+				export class MemberDetailComponent implements OnInit {
+
+				  user: User;
+				  constructor(private userService: UserService,
+							  private alertify: AlertifyService,
+							  private route: ActivatedRoute) { }
+
+
+				  ngOnInit() {
+					this.loadUser();
+				  }
+
+				  // members/4
+				  loadUser() {
+					this.userService.getUser(+this.route.snapshot.params['id'])
+								.subscribe( (user: User) => {
+									this.user = user;
+								},
+								error => {
+									this.alertify.error(error);
+								});
+				  }
+
+				}
+		
+		
+		
+		-->  in html put the following line
+		
+			<p>{{user?.knownAs}}</p>
+			
+			attention to ? (question mark)
+			it is used for safe navigation
+			
+			
+
+		--> in member-card html put the follwing line
+		
+			<button class="btn btn-primary" [routerLink]="['/members/',user.id]"><i class="fa fa-user"></i></button>
+
+
+
+-- 	
+
+		--> go to https://valor-software.com/ngx-bootstrap/#/
+		--> go to tabs
+		
+		--> in ap.module.ts
+		
+		..
+		import { BsDropdownModule, TabsModule } from 'ngx-bootstrap';
+		..
+		TabsModule should be added
+		
+		
+		
+		imports: [
+		  BrowserModule,
+		  AppRoutingModule,
+		  HttpClientModule,
+		  FormsModule,
+		  BsDropdownModule.forRoot(),
+		  TabsModule.forRoot(), 			//add this line
+		  RouterModule.forRoot(appRoutes),
+		
+
+
+
+-- 	
+		--> add photo gallery functionality 
+		
+		--> - got https://www.npmjs.com/package/ngx-gallery
+			- click link demo
+			
+		--> run the following line
+		
+			Dating-SPA\> 	npm install ngx-gallery@5.3.2 --save
+		     
+			follow examples to embed this functionality to front end
+						
+-- 
+
+
+		- editing profile
+		- CanDeactivate Route Guard		
+		- The @ViewChild decorator
+		- persisting changes to the API
+		
+-- 	
+		--> in Member/edit  do the followings
+		
+		<div *ngIf="editForm.dirty">
+			
+		</div>
+		
+		...
+		
+		<form #editForm="ngForm" (ngSubmit)="updateUser()">
+                      <h4>Description</h4>
+					  ...
+		</form>
+	
+	
+	
+-- 
+
+		--> with the following line of code it is possible 
+			to access html element from ts file
+		
+		@ViewChild('editForm') editForm: NgForm;
+		
+		
+
+-- 	
+
+		--> after writing something to a form "editForm" the user may redirect to an another page
+		    in this case user should be warned.
+			
+		--> we need a new file "prevent-unsaved-changes.guars.ts" in guard folder
+		
+			import { Injectable } from '@angular/core';
+
+
+			import { MemberEditComponent } from '../members/member-edit/member-edit.component';
+			import { CanDeactivate } from '@angular/router';
+
+
+			@Injectable()
+			export class PreventUnsavedChanges implements CanDeactivate<MemberEditComponent> {
+				canDeactivate(component: MemberEditComponent) {
+					if (component.editForm.dirty) {
+						return confirm('sure? any unsaved changes will be lost');
+					}
+
+					return true;
+				}
+			}
+
+		--> in app.modules.ts 
+		
+			.. 
+			providers :
+			..
+			PreventUnsavedChanges
+			..
+			
+			
+		--> in routes.ts we need the following lines of code
+		
+		    { path: 'member2/edit', component: MemberEditComponent,
+					resolve: {user: MemberEditResolver},
+					canDeactivate: [PreventUnsavedChanges]
+            },
+	
+		--> 
+
+	
+	
+-- 
+
+		--> develop HttpPut for user update in .NET Core API project
+		
+		--> in postman for test of Put method the following input can be used
+		
+			{
+				"introduction": "updated intro",
+				"lookingFor": "updated lookıngFor",
+				"interests": "updated interests",
+				"city": "updated city",
+				"country": "updated country"
+			}
 
 
 
 
 -- 	
 		
-	
-	
-
--- 
-
-
-
-
-
-
--- 	
-	
-	
-
-
-	
-	
--- 
-
-
-
-
-
-
--- 	
+		--> upload photo
+			
+			- Where to store photos
+			- Adding a new controller for photos
+			- Adding file uploader functionality to SPA
+			- Seetting the Main Photo
+			- Any to any component communication
+			- Deleting photos
 		
 	
+
+-- 
+
+
+		
+
+		- cloudinary
+		- cloud_name, api_key, api_secret
+		
+		- after sign up the follow link should be opened
+		https://cloudinary.com/documentation/dotnet_integration#_net_getting_started_guide
+
+		step 1: installation
+		
+		step 2: configuration
+		
+		step 3: upload
+		
+		
+		
+				var uploadParams = new ImageUploadParams()
+				{
+				  File = new FileDescription(@"mypicture.jpg")
+				};
+				var uploadResult = cloudinary.Upload(uploadParams);
+				
+
+
+				
+				var uploadParams = new ImageUploadParams()
+				{
+				  File = new FileDescription(@"http://www.example.com/image.jpg")
+				};
+				var uploadResult = cloudinary.Upload(uploadParams);
+
+
+
+				
+				var uploadParams = new VideoUploadParams()
+				  {
+					File = new FileDescription(@"dog.mp4"),
+					ResourceType = "video"
+					PublicId = "my_folder/my_sub_folder/my_dog",
+					Overwrite = true,
+					NotificationUrl = "http://mysite/my_notification_endpoint"
+				  };
+				  var uploadResult = cloudinary.Upload(uploadParams);
+
+
+		 RESPONSE : 
+		
+		 RESPONSE (ImageUploadResult):
+		 {
+		  "public_id":"tquyfignx5bxcbsupr6a",
+		  "version":1375302801,
+		  "signature":"52ecf23eeb987b3b5a72fa4ade51b1c7a1426a97",
+		  "width":1920,
+		  "height":1200,
+		  "format":"jpg",
+		  "resource_type":"image",
+		  "created_at":"2017-07-31T20:33:21Z",
+		  "bytes":737633,
+		  "type":"upload",
+		  "url":
+		   "https://res.cloudinary.com/demo/image/upload/v1375302801/tquyfignx5bxcbsupr6a.jpg",
+		  "secure_url":
+		   "https://res.cloudinary.com/demo/image/upload/v1375302801/tquyfignx5bxcbsupr6a.jpg"
+		 }
+		 
+		 
+		--> example for uploading image
+		
+		var cloudinary = new Cloudinary(
+						  new Account(
+							"my_cloud_name",
+							"my_api_key",
+							"my_api_secret"));
+    
 	
+		var uploadParams = new ImageUploadParams()
+		{
+		  File = new FileDescription(@"C:\mypicture.jpg"),
+		  PublicId = "sample_id",
+		  Transformation = new Transformation().Crop("limit").Width(40).Height(40),
+		  EagerTransforms = new List<Transformation>()
+		  {
+			new Transformation().Width(200).Height(200).Crop("thumb").Gravity("face").
+			  Radius(20).Effect("sepia"),
+			new Transformation().Width(100).Height(150).Crop("fit").FetchFormat("png")
+		  },
+		  Tags = "special, for_homepage"
+		};
+
+		var uploadResult = cloudinary.Upload(uploadParams);
+		
+		
+		
+		
+		step 4: Display and manipulate images and videos
+		
+								
+		
+-- 	
+		in .NETcore API application add the following lines to appsettings.json
+		
+		...
+		  
+		  "AllowedHosts": "*"
+		  
+		  "CloudinarySettings": {
+			"CloudName": "",
+			"ApiKey": "",
+			"Apisecret": ""
+		  }
 	
 -- 
 
 
+		add helper CloudinarySettings class to helper folder
+		
+		public class CloudinarySettings
+		{
+			public string CloudName { get; set; }
 
+			public string ApiKey { get; set; }
+
+			public string ApiSecret { get; set; }
+
+		}
+
+-- 	
+
+		add the following lines to Startup ConfigureServices
+		
+		...
+			
+			services.AddCors();
+
+			//add this line
+			services.Configure<CloudinarySettings>(Configuration.GetSection("CloudinarySettings"));
+
+			services.AddAutoMapper();
+			
+		...
 
 
 
 -- 	
 	
+		\> add prop "PublicId" to Photo class
 	
-
-
-	
-	
+		\> dotnet ef migrations add AddedPublicId
+		    Done.
+			
+		\> dotnet ef database update
+			Done.
+			
+		 
 -- 
 
 
+		- add CloudinaryDotNet to API project using nuget manager
+		
+		- if it fails.. add ref as assembly
+		
 
 
 
+-- 
+
+		-> add 3rd party file upload componet
+			- google ng2-file-upload
+		    - go to	https://github.com/valor-software/ng2-file-upload
+			- npm install ng2-file-upload --save
+			  or 
+			  npm install ng2-file-upload@1.3.0 --save
+			
+		-> copy html from markup tab in https://valor-software.com/ng2-file-upload/
+		   - paste it to "photo-editor.component.html"
+		   - change "uploader.isHTML5" as "uploader.options.isHTML5"
+			
+			
+		-> copy ts from typscript tab in same link
+		   - do necessary chagenges is photo-editor.component.ts file
+		   - add "FileUploadModule" to import part in app.module.ts
+		   - use "card bg-faded p-3 text-center mb-3" instead of the class "well" in "photo-editor.component.html"
+		   
+		   
+			
+-- 
+
+		component-to-component interaction
+		
+		add the following two lines in in auth.service.ts
+		
+		.. 
+		photoUrl = new BehaviorSubject<string>('../../assets/user.png');
+		currentPhotoUrl = this.photoUrl.asObservable();
+		..
 
 -- 	
+		--> in register.components.ts it is possible use FormGroup to use Reactive Angular forms
+	
+	
+		 import { FormGroup, FormControl } from '@angular/forms';
 		
 	
-	
+		 this.registerForm = new FormGroup({
+			  username: new FormControl(),
+			  password: new FormControl(),
+			  confirmPassword: new FormControl()
+			});
+		
+		
+		--> use validators in registerForm for validation of forms
 
--- 
-
-
-
-
-
-
--- 	
-	
-	
-
-
-	
-	
--- 
-
-
-
-
-
-
--- 	
-
-
-
-
-
-
--- 	
-	
-	
-
-
-	
-	
--- 
-
-
-
-
-
-
--- 	
+		--> use FormBuilder for register form
 		
 	
-	
-	
--- 
-
-
-
-
-
-
 -- 	
-	
-	
-
-
-	
-	
--- 
-
-
-
-
-
-
--- 	
+		--> html elements in front may behave differently in different browsers.
 		
-	
-	
-
--- 
-
-
-
-
-
-
--- 	
-	
-	
-
-
-	
-	
--- 
-
-
-
-
-
-
--- 	
-
-
-
-
-
-
--- 	
-	
-	
-
-
-	
-	
--- 
-
-
-
-
-
-
--- 	
+			for example..
+			
+			for IE9, IE10, IE11 the commented lines in polyfills.ts
+			could be uncommented
+			
+			//import 'core-js/es6/symbol'
+			...
 		
-	
-	
-	
 -- 
 
-
-
-
-
-
--- 	
-	
-	
-
-
-	
-	
--- 
-
-
+		--> to make html5 date element more usable
+			{ BsDatepickerConfig } from 'ngx-bootstrap'  can be used
 
 
 
@@ -1897,8 +2562,6 @@ To Solve CORS problem
 		
 	
 	
-			
-	
 		
 	
 	
@@ -1917,8 +2580,5 @@ To Solve CORS problem
 		
 	
 	
-			
-	
-		
 	
 	
