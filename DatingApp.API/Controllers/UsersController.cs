@@ -32,13 +32,32 @@ namespace DatingApp.API.Controllers
             _mapper = mapper;
         }
 
+        ////[HttpGet("GetUsers")] // to use as "http://localhost:5000/api/users/GetUsers"
+        //[HttpGet] // http://localhost:5000/api/users
+        //public async Task<IActionResult> GetUsers()
+        //{
+        //    var users = await _repo.GetUsers();
+
+        //    var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
+
+        //    //return Ok(users);
+        //    return Ok(usersToReturn);
+        //}
+
+
         //[HttpGet("GetUsers")] // to use as "http://localhost:5000/api/users/GetUsers"
         [HttpGet] // http://localhost:5000/api/users
-        public async Task<IActionResult> GetUsers()
+        public async Task<IActionResult> GetUsers(UserParams userParams)
         {
-            var users = await _repo.GetUsers();
+            var users = await _repo.GetUsers(userParams);
 
             var usersToReturn = _mapper.Map<IEnumerable<UserForListDto>>(users);
+
+            Response.AddPagination(
+                            users.CurrentPage, 
+                            users.PageSize, 
+                            users.TotalCount, 
+                            users.TotalPages);
 
             //return Ok(users);
             return Ok(usersToReturn);
